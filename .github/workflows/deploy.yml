@@ -39,13 +39,9 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Папка, куда положим файлы
-            DEPLOY_DIR=~/simplefront
-            # Создаем директорию, если нет
-            mkdir -p $DEPLOY_DIR
-            # Удалим старые манифесты
-            rm -rf $DEPLOY_DIR/*
-            # Копируем манифесты на сервер (в следующем шаге)
+            DEPLOY_DIR=~/simplefront           
+            mkdir -p $DEPLOY_DIR          
+            rm -rf $DEPLOY_DIR/*           
             echo "Ready to copy files."
       - name: SCP k3s manifests to VPS
         uses: appleboy/scp-action@v0.1.6
@@ -55,7 +51,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "k3s/*"
           target: "~/simplefront/"
-
       - name: Apply k3s manifests on VPS
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -63,9 +58,8 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/simplefront
-            # Обновляем образ в манифесте (на всякий случай)
-            sed -i 's|image:.*|image: '"${{ env.IMAGE_NAME }}:latest"'|' deployment.yaml
-            # Применяем манифесты
+            cd ~/simplefront/k3s
+            # Подменяем образ внутри deployment.yaml
+            sed -i 's|image:.*|image: '"${{ env.IMAGE_NAME }}:latest"'|' deployment.yaml           
             kubectl apply -f .
-            echo "✅ Deployment complete."
+            echo "Deployment complete."

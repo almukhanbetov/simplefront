@@ -15,7 +15,7 @@ spec:
         app: frontsimple
     spec:
       containers:
-        - name: react-container
+        - name: frontsimple-container
           image: almuko/frontsimple:latest # 👈 заменишь на свой dockerhub
           ports:
             - containerPort: 80
